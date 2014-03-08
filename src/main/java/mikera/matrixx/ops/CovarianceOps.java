@@ -26,6 +26,7 @@ import mikera.matrixx.algo.decompose.chol.impl.InnerCholesky;
 import mikera.matrixx.algo.linsol.ILinearSolver;
 import mikera.matrixx.algo.linsol.impl.CholLinearSolver;
 import mikera.matrixx.algo.linsol.impl.SafeLinearSolver;
+import mikera.matrixx.algo.misc.UnrolledInverseFromMinor;
 
 /**
  * Contains operations specific to covariance matrices.

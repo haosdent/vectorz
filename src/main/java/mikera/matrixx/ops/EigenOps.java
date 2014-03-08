@@ -20,8 +20,14 @@ package mikera.matrixx.ops;
 
 import mikera.matrixx.Matrix;
 import mikera.matrixx.UtilEjml;
+import mikera.matrixx.algo.decompose.eig.IEigen;
+import mikera.matrixx.algo.decompose.eig.impl.EigenPowerMethod;
+import mikera.matrixx.algo.decompose.lu.impl.AltLU;
 import mikera.matrixx.algo.linsol.ILinearSolver;
+import mikera.matrixx.algo.linsol.impl.LULinearSolver;
 import mikera.matrixx.algo.mult.VectorVectorMult;
+import mikera.matrixx.data.Complex64F;
+import mikera.matrixx.data.Eigenpair;
 
 /**
  * Additional functions related to eigenvalues and eigenvectors of a matrix.
@@ -93,7 +99,7 @@ public class EigenOps {
     double prevError = Double.MAX_VALUE;
     boolean hasWorked = false;
 
-    ILinearSolver solver = LinearSolverFactory.linear(M.rowCount());
+    ILinearSolver solver = new LULinearSolver(new AltLU());
 
     double perp = 0.0001;
 
@@ -258,7 +264,7 @@ public class EigenOps {
    * @return A diagonal matrix containing the eigenvalues.
    */
 
-  public static Matrix createMatrixD(EigenDecomposition eig) {
+  public static Matrix createMatrixD(IEigen eig) {
     int N = eig.getNumberOfEigenvalues();
 
     Matrix D = Matrix.create(N, N);
@@ -286,7 +292,7 @@ public class EigenOps {
    * @return An m by m matrix containing eigenvectors in its columns.
    */
 
-  public static Matrix createMatrixV(EigenDecomposition<Matrix> eig) {
+  public static Matrix createMatrixV(IEigen eig) {
     int N = eig.getNumberOfEigenvalues();
 
     Matrix V = Matrix.create(N, N);

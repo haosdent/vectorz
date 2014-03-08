@@ -21,11 +21,14 @@ package mikera.matrixx.ops;
 import mikera.matrixx.Matrix;
 import mikera.matrixx.UtilEjml;
 import mikera.matrixx.algo.decompose.chol.impl.InnerCholesky;
+import mikera.matrixx.algo.decompose.eig.IEigen;
+import mikera.matrixx.algo.decompose.eig.impl.SwitchingEigen;
 import mikera.matrixx.algo.decompose.lu.ILU;
 import mikera.matrixx.algo.decompose.lu.impl.AltLU;
 import mikera.matrixx.algo.decompose.svd.ISVD;
 import mikera.matrixx.algo.decompose.svd.impl.ImplicitSVD;
 import mikera.matrixx.algo.mult.VectorVectorMult;
+import mikera.matrixx.data.Complex64F;
 
 /**
  * <p>
@@ -127,8 +130,7 @@ public class MatrixFeatures {
     if (!isSquare(A))
       return false;
 
-    EigenDecomposition<Matrix> eig =
-        DecompositionFactory.eig(A.columnCount(), false);
+    IEigen eig = new SwitchingEigen(A.columnCount(), false, 1e-8);
     if (eig.inputModified())
       A = A.clone();
     eig.decompose(A);
