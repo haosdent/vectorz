@@ -422,8 +422,16 @@ public final class Matrix extends ADenseArrayMatrix {
     data[i] += d;
   }
 
+  public void minusAt(int i, double d) {
+    data[i] -= d;
+  }
+
   public void divideAt(int i, double d) {
     data[i] /= d;
+  }
+
+  public void multiplyAt(int i, double d) {
+    data[i] *= d;
   }
 
   @Override

@@ -23,21 +23,19 @@ import mikera.matrixx.UtilEjml;
 import mikera.matrixx.algo.decompose.lu.impl.ALU;
 import mikera.matrixx.algo.decompose.lu.impl.AltLU;
 import mikera.matrixx.algo.linsol.ILinearSolver;
+import mikera.matrixx.algo.linsol.IReducedRowEchelonForm;
+import mikera.matrixx.algo.linsol.impl.HouseholderColumnQRLinearSolver;
 import mikera.matrixx.algo.linsol.impl.LULinearSolver;
+import mikera.matrixx.algo.linsol.impl.PseudoInverseSVDLinearSolver;
 import mikera.matrixx.algo.linsol.impl.SafeLinearSolver;
+import mikera.matrixx.algo.misc.RrefGaussJordanRowPivot;
+import mikera.matrixx.algo.misc.TransposeAlgs;
 import mikera.matrixx.algo.misc.UnrolledDeterminantFromMinor;
 import mikera.matrixx.algo.misc.UnrolledInverseFromMinor;
-import org.ejml.alg.dense.decomposition.lu.LUDecompositionAlt_D64;
-import org.ejml.alg.dense.linsol.LinearSolverSafe;
-import org.ejml.alg.dense.linsol.lu.LinearSolverLu;
-import org.ejml.alg.dense.misc.*;
 import mikera.matrixx.algo.mult.MatrixMatrixMult;
 import mikera.matrixx.algo.mult.MatrixMultProduct;
 import mikera.matrixx.algo.mult.MatrixVectorMult;
 import mikera.matrixx.Matrix;
-import org.ejml.factory.LinearSolverFactory;
-import org.ejml.interfaces.linsol.LinearSolver;
-import org.ejml.interfaces.linsol.ReducedRowEchelonForm;
 
 /**
  * <p>
@@ -524,8 +522,12 @@ public class CommonOps {
    * @return true if it could invert the matrix false if it could not.
    */
   public static boolean solve(Matrix a, Matrix b, Matrix x) {
-    ILinearSolver solver =
-        LinearSolverFactory.general(a.rowCount(), a.columnCount());
+    ILinearSolver solver;
+    if (a.rowCount() == a.columnCount()) {
+      solver = new LULinearSolver(new AltLU());
+    } else {
+      solver = new HouseholderColumnQRLinearSolver();
+    }
 
     // make sure the inputs 'a' and 'b' are not modified
     solver = new SafeLinearSolver(solver);
@@ -545,8 +547,7 @@ public class CommonOps {
    * <p>
    * For square matrices the transpose is truly in-place and does not require
    * additional memory. For non-square matrices, internally a temporary matrix
-   * is declared and
-   * {@link #transpose(org.ejml.data.Matrix, org.ejml.data.Matrix)} is invoked.
+   * is declared and {@link #transpose(Matrix, Matrix)} is invoked.
    * </p>
    * 
    * @param mat The matrix that is to be transposed. Modified.
@@ -755,8 +756,7 @@ public class CommonOps {
    * pinv(A) = A<sup>T</sup>(AA<sup>T</sup>)<sup>-1</sup><br>
    * </p>
    * <p>
-   * Internally it uses
-   * {@link org.ejml.alg.dense.linsol.svd.SolvePseudoInverseSvd} to compute the
+   * Internally it uses {@link PseudoInverseSVDLinearSolver} to compute the
    * inverse. For performance reasons, this should only be used when a matrix is
    * singular or nearly singular.
    * </p>
@@ -766,7 +766,7 @@ public class CommonOps {
    * @return
    */
   public static void pinv(Matrix A, Matrix invA) {
-    ILinearSolver solver = LinearSolverFactory.pseudoInverse(true);
+    ILinearSolver solver = new PseudoInverseSVDLinearSolver();
     if (solver.modifiesA())
       A = A.clone();
 
@@ -1049,12 +1049,11 @@ public class CommonOps {
 
     // interestingly, the performance is only different for small matrices but
     // identical for larger ones
-    if (src instanceof Matrix && dst instanceof Matrix) {
-      ImplCommonOps_Matrix.extract((Matrix) src, srcY0, srcX0, (Matrix) dst,
-          dstY0, dstX0, h, w);
-    } else {
-      ImplCommonOps_Matrix64F.extract(src, srcY0, srcX0, dst, dstY0, dstX0, h,
-          w);
+    for (int y = 0; y < h; y++) {
+      for (int x = 0; x < y; x++) {
+        double v = src.get(y + srcY0, x + srcX0);
+        dst.set(dstY0 + y, dstX0 + x, v);
+      }
     }
   }
 
@@ -1091,7 +1090,12 @@ public class CommonOps {
 
     Matrix dst = Matrix.create(h, w);
 
-    ImplCommonOps_Matrix.extract(src, srcY0, srcX0, dst, 0, 0, h, w);
+    for (int y = 0; y < h; y++) {
+      for (int x = 0; x < w; x++) {
+        double v = src.get(y + srcY0, x + srcX0);
+        dst.set(y, x, v);
+      }
+    }
 
     return dst;
   }
@@ -1251,7 +1255,7 @@ public class CommonOps {
     long length = a.elementCount();
 
     for (int i = 0; i < length; i++) {
-      a.times(i, b.get(i));
+      a.multiplyAt(i, b.get(i));
     }
   }
 
@@ -1675,7 +1679,7 @@ public class CommonOps {
     final long length = a.elementCount();
 
     for (int i = 0; i < length; i++) {
-      a.minus(i, b.get(i));
+      a.minusAt(i, b.get(i));
     }
   }
 
@@ -1725,7 +1729,7 @@ public class CommonOps {
     final long size = a.elementCount();
 
     for (int i = 0; i < size; i++) {
-      a.times(i, alpha);
+      a.minusAt(i, alpha);
     }
   }
 
@@ -1865,7 +1869,7 @@ public class CommonOps {
     if (numUnknowns <= 0)
       numUnknowns = Math.min(A.columnCount(), A.rowCount());
 
-    ReducedRowEchelonForm<Matrix> alg = new RrefGaussJordanRowPivot();
+    IReducedRowEchelonForm alg = new RrefGaussJordanRowPivot();
     alg.setTolerance(elementMaxAbs(A) * UtilEjml.EPS
         * Math.max(A.rowCount(), A.columnCount()));
 
