@@ -22,8 +22,8 @@ import java.util.Random;
 
 import mikera.matrixx.Matrix;
 import mikera.matrixx.UtilEjml;
+import mikera.matrixx.algo.decompose.eig.impl.EigenvalueSmall;
 import mikera.matrixx.ops.CommonOps;
-import org.ejml.alg.dense.decomposition.eig.EigenvalueSmall;
 
 /**
  * <p>

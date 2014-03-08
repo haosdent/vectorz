@@ -19,6 +19,9 @@
 package mikera.matrixx.algo.decompose.svd.impl;
 
 import mikera.matrixx.Matrix;
+import mikera.matrixx.algo.decompose.bidiagonal.IBidiagonal;
+import mikera.matrixx.algo.decompose.bidiagonal.impl.RowBidiagonal;
+import mikera.matrixx.algo.decompose.bidiagonal.impl.TallBidiagonal;
 import mikera.matrixx.algo.decompose.svd.ISVD;
 import mikera.matrixx.ops.CommonOps;
 
@@ -54,7 +57,7 @@ public class ImplicitSVD implements ISVD {
   // If U is not being computed and the input matrix is 'tall' then a special
   // bidiagonal decomposition
   // can be used which is faster.
-  private BidiagonalDecomposition<Matrix> bidiag;
+  private IBidiagonal bidiag;
   private ImplicitSVDAlgo qralg = new ImplicitSVDAlgo();
   private Matrix Ut;
   private Matrix Vt;
@@ -164,8 +167,8 @@ public class ImplicitSVD implements ISVD {
     if (W == null)
       W = Matrix.create(m, n);
     else {
-      W.reshape(m, n, false);
-      W.zero();
+      W.reshape(m, n);
+      CommonOps.fill(W, 0.0);
     }
 
     for (int i = 0; i < numSingular; i++) {
@@ -284,12 +287,12 @@ public class ImplicitSVD implements ISVD {
     // decomposition algorithm
     if (canUseTallBidiagonal && numRows > numCols * 2 && !computeU) {
       if (bidiag == null
-          || !(bidiag instanceof BidiagonalDecompositionTall_D64)) {
-        bidiag = new BidiagonalDecompositionTall_D64();
+          || !(bidiag instanceof TallBidiagonal)) {
+        bidiag = new TallBidiagonal();
       }
     } else if (bidiag == null
-        || !(bidiag instanceof BidiagonalDecompositionRow_D64)) {
-      bidiag = new BidiagonalDecompositionRow_D64();
+        || !(bidiag instanceof RowBidiagonal)) {
+      bidiag = new RowBidiagonal();
     }
   }
 

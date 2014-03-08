@@ -47,8 +47,9 @@ public class SwitchingEigen implements IEigen {
    * @param tol Tolerance for a matrix being symmetric
    */
   public SwitchingEigen(int matrixSize, boolean computeVectors, double tol) {
-    symmetricAlg = DecompositionFactory.eig(matrixSize, computeVectors, true);
-    generalAlg = DecompositionFactory.eig(matrixSize, computeVectors, false);
+    //FIXME
+    //symmetricAlg = DecompositionFactory.eig(matrixSize, computeVectors, true);
+    //generalAlg = DecompositionFactory.eig(matrixSize, computeVectors, false);
     this.computeVectors = computeVectors;
     this.tol = tol;
   }

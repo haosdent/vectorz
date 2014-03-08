@@ -19,6 +19,7 @@
 package mikera.matrixx.algo.linsol.impl;
 
 import mikera.matrixx.Matrix;
+import mikera.matrixx.algo.decompose.TriangularSolver;
 import mikera.matrixx.algo.decompose.chol.impl.ACholesky;
 import mikera.matrixx.ops.SpecializedOps;
 

@@ -20,15 +20,10 @@ package mikera.matrixx.algo.decompose.lu.impl;
 
 import mikera.matrixx.Matrix;
 import mikera.matrixx.UtilEjml;
+import mikera.matrixx.algo.decompose.TriangularSolver;
 import mikera.matrixx.algo.decompose.lu.ILU;
 import mikera.matrixx.ops.CommonOps;
 import mikera.matrixx.ops.SpecializedOps;
-import org.ejml.UtilEjml;
-import org.ejml.alg.dense.decomposition.TriangularSolver;
-import org.ejml.data.Matrix;
-import org.ejml.interfaces.decomposition.LUDecomposition;
-import org.ejml.ops.CommonOps;
-import org.ejml.ops.SpecializedOps;
 
 /**
  * <p>

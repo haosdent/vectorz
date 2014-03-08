@@ -20,8 +20,7 @@ package mikera.matrixx.algo.linsol.impl;
 
 import mikera.matrixx.Matrix;
 import mikera.matrixx.algo.linsol.ILinearSolver;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.interfaces.linsol.LinearSolver;
+import mikera.matrixx.algo.linsol.InvertUsingSolve;
 
 
 /**
@@ -55,6 +54,6 @@ public abstract class ALinearSolver implements ILinearSolver {
 
     @Override
     public void invert(Matrix A_inv) {
-        InvertUsingSolve.invert(this,A,A_inv);
+        InvertUsingSolve.invert(this, A, A_inv);
     }
 }
