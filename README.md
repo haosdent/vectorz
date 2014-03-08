@@ -11,7 +11,7 @@ Vectorz can do over *1 billion* 3D vector operations per second on a single thre
 
 Vectorz is reasonably mature, battle tested and being used in production applications. The API is still evolving however as new features get added so you can expect a few minor changes, at least until version 1.0.0
 
-[![Build Status](https://secure.travis-ci.org/mikera/vectorz.png)](http://travis-ci.org/mikera/vectorz)
+[![Build Status](https://secure.travis-ci.org/haosdent/vectorz.png)](http://travis-ci.org/haosdent/vectorz)
 
 ### Documentation
 
